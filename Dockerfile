@@ -14,13 +14,13 @@ RUN dnf -y update && dnf -y install systemd && dnf clean all && \
   rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 # Install Ansible and other requirements.
-RUN dnf makecache fast \
- && dnf -y install \
-      ansible \
-      sudo \
-      which \
-      python2-dnf \
- && dnf clean all
+RUN dnf makecache \
+  && dnf -y install \
+    ansible \
+    sudo \
+    which \
+    python2-dnf \
+  && dnf clean all
 
 # Disable requiretty.
 RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
