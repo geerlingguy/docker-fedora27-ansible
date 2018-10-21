@@ -2,7 +2,7 @@ FROM fedora:27
 LABEL maintainer="Jeff Geerling"
 ENV container=docker
 
-ENV pip_packages "ansible"
+ENV pip_packages "ansible yamllint ansible-lint flake8 testinfra molecule"
 
 RUN dnf -y update && dnf clean all
 
@@ -24,6 +24,8 @@ RUN dnf makecache \
     sudo \
     which \
     python2-dnf \
+    python2-devel \
+    @development-tools \
   && dnf clean all
 
 # Install Ansible via Pip.
