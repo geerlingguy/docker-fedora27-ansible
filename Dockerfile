@@ -2,6 +2,8 @@ FROM fedora:27
 LABEL maintainer="Jeff Geerling"
 ENV container=docker
 
+ENV pip_packages "ansible"
+
 # Update and enable systemd.
 RUN dnf -y update && dnf -y install systemd && dnf clean all && \
   (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
@@ -13,20 +15,24 @@ RUN dnf -y update && dnf -y install systemd && dnf clean all && \
   rm -f /lib/systemd/system/basic.target.wants/*;\
   rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-# Install Ansible and other requirements.
+# Install pip and other requirements.
 RUN dnf makecache \
   && dnf -y install \
-    ansible \
+    python2-pip \
     sudo \
     which \
     python2-dnf \
   && dnf clean all
 
+# Install Ansible via Pip.
+RUN pip install $pip_packages
+
 # Disable requiretty.
 RUN sed -i -e 's/^\(Defaults\s*requiretty\)/#--- \1/'  /etc/sudoers
 
 # Install Ansible inventory file.
+RUN mkdir -p /etc/ansible
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
-CMD ["/usr/sbin/init"]
+CMD ["/usr/lib/systemd/systemd"]
