@@ -4,8 +4,10 @@ ENV container=docker
 
 ENV pip_packages "ansible"
 
-# Update and enable systemd.
-RUN dnf -y update && dnf -y install systemd && dnf clean all && \
+RUN dnf -y update && dnf clean all
+
+# Enable systemd.
+RUN dnf -y install systemd && dnf clean all && \
   (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
   rm -f /lib/systemd/system/multi-user.target.wants/*;\
   rm -f /etc/systemd/system/*.wants/*;\
@@ -35,4 +37,4 @@ RUN mkdir -p /etc/ansible
 RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
-CMD ["/usr/lib/systemd/systemd"]
+CMD ["/usr/sbin/init"]
